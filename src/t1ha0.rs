@@ -9,24 +9,6 @@ const PRIME32_4: u32 = 0x86F0FD61;
 const PRIME32_5: u32 = 0xCA2DA6FB;
 const PRIME32_6: u32 = 0xC4BB3575;
 
-#[inline(always)]
-pub fn mixup32(a: &mut u32, b: &mut u32, v: u32, prime: u32) {
-    let l = u64::from(b.wrapping_add(v)).wrapping_mul(u64::from(prime));
-    *a ^= l as u32;
-    *b = b.wrapping_add((l >> 32) as u32);
-}
-
-#[inline(always)]
-pub fn final32(a: u32, b: u32) -> u64 {
-    let mut l = u64::from(b ^ rot32(a, 13)) | u64::from(a) << 32;
-    l = l.wrapping_mul(PRIME_0 as u64);
-    l ^= l.wrapping_shr(41);
-    l = l.wrapping_mul(PRIME_4 as u64);
-    l ^= l.wrapping_shr(47);
-    l = l.wrapping_mul(PRIME_6 as u64);
-    l
-}
-
 /// The little-endian variant for 32-bit CPU.
 #[cfg(feature = "unaligned_access")]
 pub fn t1ha0_32le(data: &[u8], seed: u64) -> u64 {

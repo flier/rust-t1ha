@@ -18,9 +18,6 @@ mod bits;
 mod nightly;
 mod t1ha0;
 
-#[cfg(test)]
-mod selfcheck;
-
 pub use t1ha0::{t1ha0_32be, t1ha0_32le};
 
 #[cfg(target_endian = "little")]
@@ -28,3 +25,18 @@ pub use t1ha0::t1ha0_32le as t1ha0;
 
 #[cfg(target_endian = "big")]
 pub use t1ha0::t1ha0_32be as t1ha0;
+
+#[cfg(all(
+    any(target_arch = "x86", target_arch = "x86_64"),
+    target_feature = "avx"
+))]
+mod t1ha0_avx;
+
+#[cfg(all(
+    any(target_arch = "x86", target_arch = "x86_64"),
+    target_feature = "avx"
+))]
+pub use t1ha0_avx::t1ha0_ia32aes_avx;
+
+#[cfg(test)]
+mod selfcheck;
