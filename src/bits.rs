@@ -27,6 +27,9 @@ fn can_read_underside<T>(ptr: *const T, size: usize) -> bool {
 }
 
 pub trait MemoryModel {
+    const ALIGNMENT: isize = mem::size_of::<Self::Item>() as isize;
+    const ALIGN_MASK: isize = Self::ALIGNMENT - 1;
+
     type Item;
 
     unsafe fn fetch<P>(p: *const P) -> Self::Item;
@@ -55,8 +58,7 @@ where
     #[inline(always)]
     unsafe fn tail<P>(p: *const P, tail: isize) -> Self::Item {
         let p = p as *const u8;
-        let shift =
-            ((mem::size_of::<T>() as isize - tail) & (mem::size_of::<T>() as isize - 1)) << 3;
+        let shift = ((Self::ALIGNMENT - tail) & Self::ALIGN_MASK) << 3;
 
         Self::fetch(p) & ((!T::zero()).wrapping_shr(shift as u32))
     }
@@ -78,8 +80,7 @@ where
     #[inline(always)]
     unsafe fn tail<P>(p: *const P, tail: isize) -> Self::Item {
         let p = p as *const u8;
-        let shift =
-            ((mem::size_of::<T>() as isize - tail) & (mem::size_of::<T>() as isize - 1)) << 3;
+        let shift = ((Self::ALIGNMENT - tail) & Self::ALIGN_MASK) << 3;
 
         Self::fetch(p).wrapping_shr(shift as u32)
     }
@@ -99,10 +100,10 @@ where
     #[inline(always)]
     unsafe fn tail<P>(p: *const P, tail: isize) -> Self::Item {
         let p = p as *const u8;
-        let offset = (mem::size_of::<T>() as isize - tail) & (mem::size_of::<T>() as isize - 1);
+        let offset = (Self::ALIGNMENT - tail) & Self::ALIGN_MASK;
         let shift = offset << 3;
 
-        if likely(can_read_underside(p, 4)) {
+        if likely(can_read_underside(p, Self::ALIGNMENT as usize)) {
             Self::fetch(p.sub(offset as usize)).wrapping_shr(shift as u32)
         } else {
             Self::fetch(p) & ((!T::zero()).wrapping_shr(shift as u32))
@@ -124,10 +125,10 @@ where
     #[inline(always)]
     unsafe fn tail<P>(p: *const P, tail: isize) -> Self::Item {
         let p = p as *const u8;
-        let offset = (mem::size_of::<T>() as isize - tail) & (mem::size_of::<T>() as isize - 1);
+        let offset = (Self::ALIGNMENT - tail) & Self::ALIGN_MASK;
         let shift = offset << 3;
 
-        if likely(can_read_underside(p, 4)) {
+        if likely(can_read_underside(p, Self::ALIGNMENT as usize)) {
             Self::fetch(p.sub(offset as usize)) & ((!T::zero()).wrapping_shr(shift as u32))
         } else {
             Self::fetch(p).wrapping_shr(shift as u32)
