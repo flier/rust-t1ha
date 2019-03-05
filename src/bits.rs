@@ -13,13 +13,13 @@ pub fn aligned_to<T, P>(p: *const P) -> bool {
 }
 
 // 'magic' primes
-pub const PRIME_0: u64 = 0xEC99BF0D8372CAAB;
-pub const PRIME_1: u64 = 0x82434FE90EDCEF39;
-pub const PRIME_2: u64 = 0xD4F06DB99D67BE4B;
-pub const PRIME_3: u64 = 0xBD9CACC22C6E9571;
-pub const PRIME_4: u64 = 0x9C06FAF4D023E3AB;
-pub const PRIME_5: u64 = 0xC060724A8424F345;
-pub const PRIME_6: u64 = 0xCB5AF53AE3AAAC31;
+pub const PRIME_0: u64 = 0xEC99_BF0D_8372_CAAB;
+pub const PRIME_1: u64 = 0x8243_4FE9_0EDC_EF39;
+pub const PRIME_2: u64 = 0xD4F0_6DB9_9D67_BE4B;
+pub const PRIME_3: u64 = 0xBD9C_ACC2_2C6E_9571;
+pub const PRIME_4: u64 = 0x9C06_FAF4_D023_E3AB;
+pub const PRIME_5: u64 = 0xC060_724A_8424_F345;
+pub const PRIME_6: u64 = 0xCB5A_F53A_E3AA_AC31;
 
 #[inline(always)]
 fn can_read_underside<T>(ptr: *const T, size: usize) -> bool {

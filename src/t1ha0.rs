@@ -1,13 +1,15 @@
+#![allow(clippy::cast_ptr_alignment)]
+
 use crate::{bits::*, nightly::*};
 
 // 32-bit 'magic' primes
-const PRIME32_0: u32 = 0x92D78269;
-const PRIME32_1: u32 = 0xCA9B4735;
-const PRIME32_2: u32 = 0xA4ABA1C3;
-const PRIME32_3: u32 = 0xF6499843;
-const PRIME32_4: u32 = 0x86F0FD61;
-const PRIME32_5: u32 = 0xCA2DA6FB;
-const PRIME32_6: u32 = 0xC4BB3575;
+const PRIME32_0: u32 = 0x92D7_8269;
+const PRIME32_1: u32 = 0xCA9B_4735;
+const PRIME32_2: u32 = 0xA4AB_A1C3;
+const PRIME32_3: u32 = 0xF649_9843;
+const PRIME32_4: u32 = 0x86F0_FD61;
+const PRIME32_5: u32 = 0xCA2D_A6FB;
+const PRIME32_6: u32 = 0xC4BB_3575;
 
 /// The little-endian variant for 32-bit CPU.
 #[cfg(feature = "unaligned_access")]
