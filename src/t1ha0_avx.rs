@@ -29,7 +29,7 @@ pub fn t1ha0_ia32aes_avx(data: &[u8], seed: u64) -> u64 {
                 let v6 = _mm_loadu_si128(v.offset(6));
                 let v7 = _mm_loadu_si128(v.offset(7));
                 v = v.add(8);
-                prefetch(v, 32);
+                prefetch(v);
 
                 let v0y = _mm_aesenc_si128(v0, y);
                 let v2x6 = _mm_aesenc_si128(v2, _mm_xor_si128(x, v6));

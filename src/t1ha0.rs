@@ -64,7 +64,7 @@ where
             let w2 = T::fetch(v.offset(2));
             let w3 = T::fetch(v.offset(3));
             v = v.add(4);
-            prefetch(v, 16);
+            prefetch(v);
 
             let d13 = w1.wrapping_add(rot32(w3.wrapping_add(d), 17));
             let c02 = w0 ^ rot32(w2.wrapping_add(c), 11);
