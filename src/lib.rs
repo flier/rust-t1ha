@@ -22,3 +22,9 @@ mod t1ha0;
 mod selfcheck;
 
 pub use t1ha0::{t1ha0_32be, t1ha0_32le};
+
+#[cfg(target_endian = "little")]
+pub use t1ha0::t1ha0_32le as t1ha0;
+
+#[cfg(target_endian = "big")]
+pub use t1ha0::t1ha0_32be as t1ha0;

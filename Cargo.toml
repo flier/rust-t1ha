@@ -1,8 +1,11 @@
 [package]
-name = "rust-t1ha"
+name = "t1ha"
 version = "0.1.0"
 authors = ["Flier Lu <flier.lu@gmail.com>"]
 edition = "2018"
+
+[lib]
+bench = false
 
 [features]
 default = []
@@ -14,5 +17,12 @@ unaligned_access = []
 version = "0.2"
 default-features = false
 
+[dev-dependencies]
+criterion = "0.2"
+
 [build-dependencies]
 rustc_version = "0.2"
+
+[[bench]]
+name = "t1ha0"
+harness = false
