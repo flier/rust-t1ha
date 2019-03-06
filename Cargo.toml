@@ -25,5 +25,5 @@ lazy_static = "1.3"
 rustc_version = "0.2"
 
 [[bench]]
-name = "t1ha0"
+name = "t1ha"
 harness = false
