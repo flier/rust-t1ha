@@ -14,6 +14,14 @@
 //!  ACKNOWLEDGEMENT:
 //!  The t1ha was originally developed by Leonid Yuriev (Леонид Юрьев)
 //!  for The 1Hippeus project - zerocopy messaging in the spirit of Sparta!
+#![no_std]
+#[cfg(any(test, feature = "std"))]
+extern crate std;
+
+use core::hash::{BuildHasherDefault, Hasher};
+#[cfg(feature = "std")]
+use std::collections::{HashMap, HashSet};
+
 mod bits;
 mod nightly;
 mod t1ha0;
@@ -64,6 +72,43 @@ pub use t1ha0_aes::t1ha0_ia32aes as t1ha0_ia32aes_avx;
 ))]
 pub use t1ha0_aes::t1ha0_ia32aes_avx2;
 
+/// An implementation of the `t1ha` hash function.
+///
+/// See the [crate documentation](index.html) for more details.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct T1haHasher(u64);
+
+impl T1haHasher {
+    /// Create a `t1ha` hasher starting with a state corresponding to the hash `key`.
+    #[inline]
+    pub fn with_seed(seed: u64) -> Self {
+        Self(seed)
+    }
+}
+
+impl Hasher for T1haHasher {
+    #[inline]
+    fn finish(&self) -> u64 {
+        self.0
+    }
+
+    #[inline]
+    fn write(&mut self, bytes: &[u8]) {
+        *self = T1haHasher(t1ha0(bytes, self.0));
+    }
+}
+
+/// A builder for default `t1ha` hashers.
+pub type T1haBuildHasher = BuildHasherDefault<T1haHasher>;
+
+/// A `HashMap` using a default `t1ha` hasher.
+#[cfg(feature = "std")]
+pub type T1haHashMap<K, V> = HashMap<K, V, T1haBuildHasher>;
+
+/// A `HashSet` using a default `t1ha` hasher.
+#[cfg(feature = "std")]
+pub type T1haHashSet<T> = HashSet<T, T1haBuildHasher>;
+
 /// `t1ha` library offers the t1ha0() function as the fastest for current CPU.
 ///
 /// But actual CPU's features/capabilities and may be significantly different,
@@ -82,8 +127,10 @@ mod prefer {
     pub use super::t1ha0_32 as HASH;
 }
 
-#[cfg(feature = "runtime_select")]
+#[cfg(all(feature = "runtime_select", feature = "std"))]
 mod prefer {
+    use std::is_x86_feature_detected;
+
     use lazy_static::lazy_static;
 
     use super::*;

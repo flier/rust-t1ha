@@ -101,7 +101,7 @@ fn t1ha2_atonce128_body<T: MemoryModel<Item = u64>>(mut data: &[u8], seed: u64) 
 }
 
 impl T1ha2Hasher {
-    pub fn new(seed_x: u64, seed_y: u64) -> Self {
+    pub fn with_seeds(seed_x: u64, seed_y: u64) -> Self {
         let mut h = Self::default();
 
         h.state.init_ab(seed_x, seed_y);
@@ -733,7 +733,7 @@ mod tests {
     fn test_t1ha2_stream() {
         selfcheck(
             |data, seed| {
-                let mut h = T1ha2Hasher::new(seed, seed);
+                let mut h = T1ha2Hasher::with_seeds(seed, seed);
                 h.update(data);
                 h.finish()
             },
@@ -745,7 +745,7 @@ mod tests {
     fn test_t1ha2_stream128() {
         selfcheck(
             |data, seed| {
-                let mut h = T1ha2Hasher::new(seed, seed);
+                let mut h = T1ha2Hasher::with_seeds(seed, seed);
                 h.update(data);
                 h.finish128() as u64
             },

@@ -8,7 +8,8 @@ edition = "2018"
 bench = false
 
 [features]
-default = ["runtime_select"]
+default = ["std", "runtime_select"]
+std = []
 unaligned_access = []
 runtime_select = ["lazy_static"]
 
