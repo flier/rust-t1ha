@@ -8,7 +8,9 @@ use std::slice;
 
 use criterion::{black_box, Criterion, ParameterizedBenchmark, Throughput};
 
-use t1ha::{t1ha0, t1ha0_ia32aes_avx, t1ha0_ia32aes_avx2, t1ha1};
+use t1ha::{
+    t1ha0, t1ha0_ia32aes_avx, t1ha0_ia32aes_avx2, t1ha1, t1ha2_atonce, t1ha2_atonce128, T1ha2Hasher,
+};
 
 const KB: usize = 1024;
 const SEED: u64 = 0x0123456789ABCDEF;
@@ -64,6 +66,35 @@ fn bench_t1ha0(c: &mut Criterion) {
             },
             &PARAMS,
         )
+        .throughput(|&&size| Throughput::Bytes(size as u32)),
+    );
+
+    c.bench(
+        "t1ha2",
+        ParameterizedBenchmark::new(
+            "t1ha2_atonce",
+            move |b, &&size| {
+                b.iter(|| t1ha2_atonce(&DATA[..size], SEED));
+            },
+            &PARAMS,
+        )
+        .with_function("t1ha2_atonce128", move |b, &&size| {
+            b.iter(|| t1ha2_atonce128(&DATA[..size], SEED));
+        })
+        .with_function("t1ha2_stream", move |b, &&size| {
+            b.iter(|| {
+                let mut h = T1ha2Hasher::new(SEED, SEED);
+                h.update(&DATA[..size]);
+                h.finish()
+            });
+        })
+        .with_function("t1ha2_stream128", move |b, &&size| {
+            b.iter(|| {
+                let mut h = T1ha2Hasher::new(SEED, SEED);
+                h.update(&DATA[..size]);
+                h.finish128() as u64
+            });
+        })
         .throughput(|&&size| Throughput::Bytes(size as u32)),
     );
 }
