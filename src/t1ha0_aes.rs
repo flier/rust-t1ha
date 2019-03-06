@@ -192,13 +192,13 @@ pub fn t1ha0_ia32aes_avx2(data: &[u8], seed: u64) -> u64 {
 
             while v.offset(7) < detent {
                 let mut t = _mm_aesenc_si128(_mm_loadu_si128(v), salt);
-                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(1)));
-                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(2)));
-                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(3)));
-                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(4)));
-                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(5)));
-                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(6)));
-                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(7)));
+                t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(1)));
+                t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(2)));
+                t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(3)));
+                t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(4)));
+                t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(5)));
+                t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(6)));
+                t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(7)));
 
                 v = v.add(8);
                 prefetch(v);

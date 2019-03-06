@@ -163,7 +163,14 @@ pub fn final64(a: u64, b: u64) -> u64 {
     mux64(x ^ y, PRIME_5)
 }
 
-/* xor high and low parts of full 128-bit product */
+/// xor-mul-xor mixer
+#[inline(always)]
+pub fn mix64(v: u64, p: u64) -> u64 {
+    let v = v.wrapping_mul(p);
+    v ^ rot64(v, 41)
+}
+
+/// xor high and low parts of full 128-bit product
 #[inline(always)]
 pub fn mux64(v: u64, prime: u64) -> u64 {
     let mut h = 0;

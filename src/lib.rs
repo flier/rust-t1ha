@@ -17,14 +17,22 @@
 mod bits;
 mod nightly;
 mod t1ha0;
+mod t1ha1;
 
 pub use t1ha0::{t1ha0_32be, t1ha0_32le};
+pub use t1ha1::{t1ha1_32be, t1ha1_32le};
 
 #[cfg(target_endian = "little")]
 pub use t1ha0::t1ha0_32le as t1ha0;
 
 #[cfg(target_endian = "big")]
 pub use t1ha0::t1ha0_32be as t1ha0;
+
+#[cfg(target_endian = "little")]
+pub use t1ha1::t1ha1_32le as t1ha1;
+
+#[cfg(target_endian = "big")]
+pub use t1ha1::t1ha1_32be as t1ha1;
 
 #[cfg(all(
     any(target_arch = "x86", target_arch = "x86_64"),
