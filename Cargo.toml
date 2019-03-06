@@ -8,10 +8,12 @@ edition = "2018"
 bench = false
 
 [features]
-default = []
+default = ["runtime_select"]
 unaligned_access = []
+runtime_select = ["lazy_static"]
 
 [dependencies]
+lazy_static = { version = "1.3", optional = true }
 
 [dependencies.num-traits]
 version = "0.2"

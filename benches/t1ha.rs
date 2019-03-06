@@ -9,7 +9,8 @@ use std::slice;
 use criterion::{black_box, Criterion, ParameterizedBenchmark, Throughput};
 
 use t1ha::{
-    t1ha0, t1ha0_ia32aes_avx, t1ha0_ia32aes_avx2, t1ha1, t1ha2_atonce, t1ha2_atonce128, T1ha2Hasher,
+    t1ha0_32, t1ha0_ia32aes_avx, t1ha0_ia32aes_avx2, t1ha1, t1ha2_atonce, t1ha2_atonce128,
+    T1ha2Hasher,
 };
 
 const KB: usize = 1024;
@@ -42,9 +43,9 @@ fn bench_t1ha0(c: &mut Criterion) {
     c.bench(
         "t1ha0",
         ParameterizedBenchmark::new(
-            "t1ha0",
+            "t1ha0_32",
             move |b, &&size| {
-                b.iter(|| t1ha0(&DATA[..size], SEED));
+                b.iter(|| t1ha0_32(&DATA[..size], SEED));
             },
             &PARAMS,
         )
