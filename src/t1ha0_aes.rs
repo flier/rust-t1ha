@@ -6,7 +6,7 @@ use core::arch::x86_64::*;
 
 use crate::{bits::*, nightly::*};
 
-pub fn t1ha0_ia32aes_avx(data: &[u8], seed: u64) -> u64 {
+pub fn t1ha0_ia32aes(data: &[u8], seed: u64) -> u64 {
     let mut len = data.len();
     let mut a = seed;
     let mut b = len as u64;
@@ -165,12 +165,157 @@ pub fn t1ha0_ia32aes_avx(data: &[u8], seed: u64) -> u64 {
     }
 }
 
+pub fn t1ha0_ia32aes_avx2(data: &[u8], seed: u64) -> u64 {
+    let mut len = data.len();
+    let mut a = seed;
+    let mut b = len as u64;
+    let mut p = data.as_ptr();
+
+    unsafe {
+        if unlikely(len > 32) {
+            let mut x = _mm_set_epi64x(a as i64, b as i64);
+            let mut y = _mm_aesenc_si128(x, _mm_set_epi64x(PRIME_0 as i64, PRIME_1 as i64));
+            let mut v = p as *const __m128i;
+            let detent = v.offset((len >> 4) as isize);
+
+            p = detent as *const _;
+
+            if (len & 16) != 0 {
+                x = _mm_add_epi64(x, _mm_loadu_si128(v));
+                y = _mm_aesenc_si128(x, y);
+                v = v.add(1);
+            }
+
+            len &= 15;
+
+            let mut salt = y;
+
+            while v.offset(7) < detent {
+                let mut t = _mm_aesenc_si128(_mm_loadu_si128(v), salt);
+                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(1)));
+                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(2)));
+                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(3)));
+                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(4)));
+                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(5)));
+                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(6)));
+                 t = _mm_aesdec_si128(t, _mm_loadu_si128(v.offset(7)));
+
+                v = v.add(8);
+                prefetch(v);
+
+                salt = _mm_add_epi64(salt, _mm_set_epi64x(PRIME_5 as i64, PRIME_6 as i64));
+                t = _mm_aesenc_si128(x, t);
+                x = _mm_add_epi64(y, x);
+                y = t;
+            }
+
+            while v < detent {
+                let v0y = _mm_add_epi64(y, _mm_loadu_si128(v.offset(0)));
+                let v1x = _mm_sub_epi64(x, _mm_loadu_si128(v.offset(1)));
+
+                v = v.add(2);
+
+                x = _mm_aesdec_si128(x, v0y);
+                y = _mm_aesdec_si128(y, v1x);
+            }
+
+            x = _mm_add_epi64(_mm_aesdec_si128(x, _mm_aesenc_si128(y, x)), y);
+
+            let (lo, hi) = extract_i64(x);
+
+            a = lo as u64;
+            b = hi as u64;
+
+            mm_empty();
+        }
+
+        let v = p as *const u64;
+
+        match len {
+            32 | 31 | 30 | 29 | 28 | 27 | 26 | 25 => {
+                mixup64(
+                    &mut a,
+                    &mut b,
+                    LittenEndianUnaligned::<u64>::fetch(v.offset(0)),
+                    PRIME_4,
+                );
+                mixup64(
+                    &mut b,
+                    &mut a,
+                    LittenEndianUnaligned::<u64>::fetch(v.offset(1)),
+                    PRIME_3,
+                );
+                mixup64(
+                    &mut a,
+                    &mut b,
+                    LittenEndianUnaligned::<u64>::fetch(v.offset(2)),
+                    PRIME_2,
+                );
+                mixup64(
+                    &mut b,
+                    &mut a,
+                    LittenEndianUnaligned::<u64>::tail(v.offset(3), len as isize),
+                    PRIME_1,
+                );
+                final64(a, b)
+            }
+            24 | 23 | 22 | 21 | 20 | 19 | 18 | 17 => {
+                mixup64(
+                    &mut b,
+                    &mut a,
+                    LittenEndianUnaligned::<u64>::fetch(v.offset(0)),
+                    PRIME_3,
+                );
+                mixup64(
+                    &mut a,
+                    &mut b,
+                    LittenEndianUnaligned::<u64>::fetch(v.offset(1)),
+                    PRIME_2,
+                );
+                mixup64(
+                    &mut b,
+                    &mut a,
+                    LittenEndianUnaligned::<u64>::tail(v.offset(2), len as isize),
+                    PRIME_1,
+                );
+                final64(a, b)
+            }
+            16 | 15 | 14 | 13 | 12 | 11 | 10 | 9 => {
+                mixup64(
+                    &mut a,
+                    &mut b,
+                    LittenEndianUnaligned::<u64>::fetch(v.offset(0)),
+                    PRIME_2,
+                );
+                mixup64(
+                    &mut b,
+                    &mut a,
+                    LittenEndianUnaligned::<u64>::tail(v.offset(1), len as isize),
+                    PRIME_1,
+                );
+                final64(a, b)
+            }
+            8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 => {
+                mixup64(
+                    &mut b,
+                    &mut a,
+                    LittenEndianUnaligned::<u64>::tail(v, len as isize),
+                    PRIME_1,
+                );
+                final64(a, b)
+            }
+            0 => final64(a, b),
+            _ => unreachable!(),
+        }
+    }
+}
+
 #[cfg(target_feature = "avx")]
 unsafe fn mm_empty() {
     _mm256_zeroupper();
 }
 
-#[cfg(not(target_feature = "avx"))]
+#[cfg(all(not(target_feature = "avx")))]
 unsafe fn mm_empty() {
     _mm_empty();
 }
@@ -224,7 +369,7 @@ mod tests {
     use super::*;
     use crate::selfcheck::selfcheck;
 
-    const T1HA_REFVAL_IA32AES: [u64; 81] = [
+    const T1HA_REFVAL_IA32AES_A: [u64; 81] = [
         0,
         0x772C7311BE32FF42,
         0xB231AC660E5B23B5,
@@ -308,8 +453,99 @@ mod tests {
         0xFC73D46F8B41BEC6,
     ];
 
+    const T1HA_REFVAL_IA32AES_B: [u64; 81] = [
+        0,
+        0x772C7311BE32FF42,
+        0x4398F62A8CB6F72A,
+        0x71F6DF5DA3B4F532,
+        0x555859635365F660,
+        0xE98808F1CD39C626,
+        0x2EB18FAF2163BB09,
+        0x7B9DD892C8019C87,
+        0xE2B1431C4DA4D15A,
+        0x1984E718A5477F70,
+        0x08DD17B266484F79,
+        0x4C83A05D766AD550,
+        0x92DCEBB131D1907D,
+        0xD67BC6FC881B8549,
+        0xF6A9886555FBF66B,
+        0x6E31616D7F33E25E,
+        0x36E31B7426E3049D,
+        0x4F8E4FAF46A13F5F,
+        0x03EB0CB3253F819F,
+        0x636A7769905770D2,
+        0x3ADF3781D16D1148,
+        0x92D19CB1818BC9C2,
+        0x283E68F4D459C533,
+        0xFA83A8A88DECAA04,
+        0x8C6F00368EAC538C,
+        0x7B66B0CF3797B322,
+        0x5131E122FDABA3FF,
+        0x6E59FF515C08C7A9,
+        0xBA2C5269B2C377B0,
+        0xA9D24FD368FE8A2B,
+        0x22DB13D32E33E891,
+        0x7B97DFC804B876E5,
+        0xC598BDFCD0E834F9,
+        0xB256163D3687F5A7,
+        0x66D7A73C6AEF50B3,
+        0xE810F88E85CEA11A,
+        0x4814F8F3B83E4394,
+        0x9CABA22D10A2F690,
+        0x0D10032511F58111,
+        0xE9A36EF5EEA3CD58,
+        0xC79242DE194D9D7C,
+        0xC3871AA0435EE5C8,
+        0x52890BED43CCF4CD,
+        0x07A1D0861ACCD373,
+        0x227B816FF0FEE9ED,
+        0x59FFBF73AACFC0C4,
+        0x09AB564F2BEDAD0C,
+        0xC05F744F2EE38318,
+        0x7B50B621D547C661,
+        0x0C1F71CB4E68E5D1,
+        0x0E33A47881D4DBAA,
+        0xF5C3BF198E9A7C2E,
+        0x16328FD8C0F68A91,
+        0xA3E399C9AB3E9A59,
+        0x163AE71CBCBB18B8,
+        0x18F17E4A8C79F7AB,
+        0x9250E2EA37014B45,
+        0x7BBBB111D60B03E4,
+        0x3DAA4A3071A0BD88,
+        0xA28828D790A2D6DC,
+        0xBC70FC88F64BE3F1,
+        0xA3E48008BA4333C7,
+        0x739E435ACAFC79F7,
+        0x42BBB360BE007CC6,
+        0x4FFB6FD2AF74EC92,
+        0x2A799A2994673146,
+        0xBE0A045B69D48E9F,
+        0x549432F54FC6A278,
+        0x371D3C60369FC702,
+        0xDB4557D415B08CA7,
+        0xE8692F0A83850B37,
+        0x022E46AEB36E9AAB,
+        0x117AC9B814E4652D,
+        0xA361041267AE9048,
+        0x277CB51C961C3DDA,
+        0xAFFC96F377CB8A8D,
+        0x83CC79FA01DD1BA7,
+        0xA494842ACF4B802C,
+        0xFC6D9CDDE2C34A3F,
+        0x4ED6863CE455F7A7,
+        0x630914D0DB7AAE98,
+    ];
+
+    #[cfg(any(target_feature = "aes", target_feature = "avx"))]
     #[test]
     fn test_ia32aes_avx() {
-        selfcheck(t1ha0_ia32aes_avx, &T1HA_REFVAL_IA32AES[..])
+        selfcheck(t1ha0_ia32aes, &T1HA_REFVAL_IA32AES_A[..])
+    }
+
+    #[cfg(target_feature = "avx2")]
+    #[test]
+    fn test_ia32aes_avx2() {
+        selfcheck(t1ha0_ia32aes_avx2, &T1HA_REFVAL_IA32AES_B[..])
     }
 }
