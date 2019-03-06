@@ -1,14 +1,28 @@
+//!
+//! t1ha1 = 64-bit, BASELINE FAST PORTABLE HASH:
+//!
+//!   - Runs faster on 64-bit platforms in other cases may runs slowly.
+//!   - Portable and stable, returns same 64-bit result
+//!     on all architectures and CPUs.
+//!   - Unfortunately it fails the "strict avalanche criteria",
+//!     see test results at https://github.com/demerphq/smhasher.
+//!
+//!     This flaw is insignificant for the t1ha1() purposes and imperceptible
+//!     from a practical point of view.
+//!     However, nowadays this issue has resolved in the next t1ha2(),
+//!     that was initially planned to providing a bit more quality.
+
 use crate::{bits::*, nightly::*};
 
-/// The little-endian variant for 32-bit CPU.
+/// The little-endian variant for 64-bit CPU.
 #[cfg(feature = "unaligned_access")]
-pub fn t1ha1_32le(data: &[u8], seed: u64) -> u64 {
+pub fn t1ha1_le(data: &[u8], seed: u64) -> u64 {
     unsafe { t1h1_body::<LittenEndianUnaligned<u64>>(data, seed) }
 }
 
-/// The little-endian variant for 32-bit CPU.
+/// The little-endian variant for 64-bit CPU.
 #[cfg(not(feature = "unaligned_access"))]
-pub fn t1ha1_32le(data: &[u8], seed: u64) -> u64 {
+pub fn t1ha1_le(data: &[u8], seed: u64) -> u64 {
     if !aligned_to::<u64, _>(data.as_ptr()) {
         unsafe { t1h1_body::<LittenEndianUnaligned<u64>>(data, seed) }
     } else {
@@ -16,15 +30,15 @@ pub fn t1ha1_32le(data: &[u8], seed: u64) -> u64 {
     }
 }
 
-/// The big-endian variant for 32-bit CPU.
+/// The big-endian variant for 64-bit CPU.
 #[cfg(feature = "unaligned_access")]
-pub fn t1ha1_32be(data: &[u8], seed: u64) -> u64 {
+pub fn t1ha1_be(data: &[u8], seed: u64) -> u64 {
     unsafe { t1h0_body::<BigEndianUnaligned<u64>>(data, seed) }
 }
 
-/// The big-endian variant for 32-bit CPU.
+/// The big-endian variant for 64-bit CPU.
 #[cfg(not(feature = "unaligned_access"))]
-pub fn t1ha1_32be(data: &[u8], seed: u64) -> u64 {
+pub fn t1ha1_be(data: &[u8], seed: u64) -> u64 {
     if !aligned_to::<u64, _>(data.as_ptr()) {
         unsafe { t1h1_body::<BigEndianUnaligned<u64>>(data, seed) }
     } else {
@@ -276,12 +290,12 @@ mod tests {
     ];
 
     #[test]
-    fn test_t1ha1_32le() {
-        selfcheck(t1ha1_32le, &T1HA_REFVAL_64LE[..])
+    fn test_t1ha1_le() {
+        selfcheck(t1ha1_le, &T1HA_REFVAL_64LE[..])
     }
 
     #[test]
-    fn test_t1ha1_32be() {
-        selfcheck(t1ha1_32be, &T1HA_REFVAL_64BE[..])
+    fn test_t1ha1_be() {
+        selfcheck(t1ha1_be, &T1HA_REFVAL_64BE[..])
     }
 }

@@ -1,4 +1,33 @@
-#![allow(clippy::cast_ptr_alignment)]
+//!  t1ha0 = 64-bit, JUST ONLY FASTER:
+//!
+//!    - Provides fast-as-possible hashing for current CPU, including
+//!      32-bit systems and engaging the available hardware acceleration.
+//!    - It is a facade that selects most quick-and-dirty hash
+//!      for the current processor. For instance, on IA32 (x86) actual function
+//!      will be selected in runtime, depending on current CPU capabilities
+//!
+//! BE CAREFUL!!!  THIS IS MEANS:
+//!
+//!   1. The quality of hash is a subject for tradeoffs with performance.
+//!      So, the quality and strength of t1ha0() may be lower than t1ha1(),
+//!      especially on 32-bit targets, but then much faster.
+//!      However, guaranteed that it passes all SMHasher tests.
+//!
+//!   2. No warranty that the hash result will be same for particular
+//!      key on another machine or another version of libt1ha.
+//!
+//!      Briefly, such hash-results and their derivatives, should be
+//!      used only in runtime, but should not be persist or transferred
+//!      over a network.
+//!
+//!
+//!  When T1HA0_RUNTIME_SELECT is nonzero the t1ha0_resolve() function could
+//!  be used to get actual t1ha0() implementation address at runtime. This is
+//!  useful for two cases:
+//!    - calling by local pointer-to-function usually is little
+//!      bit faster (less overhead) than via a PLT thru the DSO boundary.
+//!    - GNU Indirect functions (see below) don't supported by environment
+//!      and calling by t1ha0_funcptr is not available and/or expensive.
 
 use crate::{bits::*, nightly::*};
 

@@ -1,5 +1,6 @@
 use crate::{bits::*, nightly::*};
 
+/// An implementation of `t1ha2` stream hasher.
 #[derive(Debug, Default)]
 pub struct T1ha2Hasher {
     state: State,
@@ -36,11 +37,13 @@ impl State {
     }
 }
 
+/// The at-once variant with 64-bit result
 #[cfg(feature = "unaligned_access")]
 pub fn t1ha2_atonce(data: &[u8], seed: u64) -> u64 {
     t1ha2_atonce_body::<LittenEndianUnaligned<u64>>(data, seed)
 }
 
+/// The at-once variant with 64-bit result
 #[cfg(not(feature = "unaligned_access"))]
 pub fn t1ha2_atonce(data: &[u8], seed: u64) -> u64 {
     if !aligned_to::<u64, _>(data.as_ptr()) {
@@ -66,11 +69,13 @@ fn t1ha2_atonce_body<T: MemoryModel<Item = u64>>(mut data: &[u8], seed: u64) -> 
     unsafe { t1ha2_tail_ab::<T>(&mut state, data) }
 }
 
+/// The at-once variant with 128-bit result.
 #[cfg(feature = "unaligned_access")]
 pub fn t1ha2_atonce128(data: &[u8], seed: u64) -> u128 {
     t1ha2_atonce128_body::<LittenEndianUnaligned<u64>>(data, seed)
 }
 
+/// The at-once variant with 128-bit result.
 #[cfg(not(feature = "unaligned_access"))]
 pub fn t1ha2_atonce128(data: &[u8], seed: u64) -> u128 {
     if !aligned_to::<u64, _>(data.as_ptr()) {
