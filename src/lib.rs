@@ -118,7 +118,7 @@ pub fn t1ha0(data: &[u8], seed: u64) -> u64 {
     prefer::HASH(data, seed)
 }
 
-#[cfg(not(feature = "runtime_select"))]
+#[cfg(not(all(feature = "runtime_select", feature = "std")))]
 mod prefer {
     #[cfg(target_pointer_width = "64")]
     pub use super::t1ha1 as HASH;
