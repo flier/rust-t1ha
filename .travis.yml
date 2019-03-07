@@ -1,0 +1,19 @@
+language: rust
+os:
+  - linux
+  - osx
+cache: cargo
+rust:
+  - stable
+  - beta
+  - nightly
+matrix:
+  allow_failures:
+    - rust: nightly
+  fast_finish: true
+env:
+  - RUSTFLAGS="-C target-cpu=native"
+  - RUST_BACKTRACE=full
+script:
+  - cargo build --verbose
+  - cargo test --verbose
