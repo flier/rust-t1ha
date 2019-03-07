@@ -21,5 +21,4 @@ env:
   - RUSTFLAGS="-C target-cpu=native"
   - RUST_BACKTRACE=full
 script:
-  - cargo build --verbose $CARGOFLAGS
   - cargo test --verbose $CARGOFLAGS
