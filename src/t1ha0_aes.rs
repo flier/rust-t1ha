@@ -1,3 +1,5 @@
+#![allow(clippy::cast_ptr_alignment, clippy::many_single_char_names)]
+
 #[cfg(target_arch = "x86")]
 use core::arch::x86::*;
 
@@ -176,7 +178,7 @@ pub fn t1ha0_ia32aes_avx2(data: &[u8], seed: u64) -> u64 {
             let mut x = _mm_set_epi64x(a as i64, b as i64);
             let mut y = _mm_aesenc_si128(x, _mm_set_epi64x(PRIME_0 as i64, PRIME_1 as i64));
             let mut v = p as *const __m128i;
-            let detent = v.offset((len >> 4) as isize);
+            let detent = v.add(len >> 4);
 
             p = detent as *const _;
 

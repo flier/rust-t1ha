@@ -11,6 +11,7 @@
 //!     from a practical point of view.
 //!     However, nowadays this issue has resolved in the next t1ha2(),
 //!     that was initially planned to providing a bit more quality.
+#![allow(clippy::cast_ptr_alignment, clippy::many_single_char_names)]
 
 use crate::{bits::*, nightly::*};
 

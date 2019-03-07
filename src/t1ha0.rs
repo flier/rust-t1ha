@@ -28,6 +28,7 @@
 //!      bit faster (less overhead) than via a PLT thru the DSO boundary.
 //!    - GNU Indirect functions (see below) don't supported by environment
 //!      and calling by t1ha0_funcptr is not available and/or expensive.
+#![allow(clippy::cast_ptr_alignment, clippy::many_single_char_names)]
 
 use crate::{bits::*, nightly::*};
 

@@ -1,3 +1,5 @@
+#![allow(clippy::cast_ptr_alignment)]
+
 use crate::{bits::*, nightly::*};
 
 /// An implementation of `t1ha2` stream hasher.
@@ -139,9 +141,8 @@ impl T1ha2Hasher {
 
         if len >= 32 {
             unsafe {
-                data = if cfg!(feature = "unaligned_access") {
-                    t1ha2_loop::<LittenEndianUnaligned<u64>>(&mut self.state, data)
-                } else if !aligned_to::<u64, _>(data.as_ptr()) {
+                data = if cfg!(feature = "unaligned_access") || !aligned_to::<u64, _>(data.as_ptr())
+                {
                     t1ha2_loop::<LittenEndianUnaligned<u64>>(&mut self.state, data)
                 } else {
                     t1ha2_loop::<LittenEndianAligned<u64>>(&mut self.state, data)
