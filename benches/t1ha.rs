@@ -32,7 +32,7 @@ lazy_static! {
     static ref DATA: Vec<u8> = (0..16 * KB).map(|b| b as u8).collect::<Vec<_>>();
 }
 
-fn bench_t1ha0(c: &mut Criterion) {
+fn bench_t1ha(c: &mut Criterion) {
     c.bench(
         "memory scan",
         ParameterizedBenchmark::new(
@@ -117,5 +117,5 @@ fn bench_t1ha0(c: &mut Criterion) {
     );
 }
 
-criterion_group!(benches, bench_t1ha0);
+criterion_group!(benches, bench_t1ha);
 criterion_main!(benches);
