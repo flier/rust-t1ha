@@ -361,10 +361,8 @@ unsafe fn extract_i64(x: __m128i) -> (i64, i64) {
 ))]
 unsafe fn extract_i64(x: __m128i) -> (i64, i64) {
     (
-        (((_mm_extract_epi32(x, 0) as u32) as u64) | u64::from(_mm_extract_epi32(x, 1)) << 32)
-            as i64,
-        (((_mm_extract_epi32(x, 2) as u32) as u64) | u64::from(_mm_extract_epi32(x, 3)) << 32)
-            as i64,
+        (u64::from(_mm_extract_epi32(x, 0) as u32) | (_mm_extract_epi32(x, 1) as u64) << 32) as i64,
+        (u64::from(_mm_extract_epi32(x, 2) as u32) | (_mm_extract_epi32(x, 3) as u64) << 32) as i64,
     )
 }
 
@@ -471,6 +469,10 @@ mod tests {
         0xFC73D46F8B41BEC6,
     ];
 
+    #[cfg(all(
+        any(target_arch = "x86", target_arch = "x86_64"),
+        target_feature = "avx2"
+    ))]
     const T1HA_REFVAL_IA32AES_B: [u64; 81] = [
         0,
         0x772C7311BE32FF42,

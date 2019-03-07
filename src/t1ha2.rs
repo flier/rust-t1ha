@@ -168,7 +168,7 @@ impl T1ha2Hasher {
     }
 
     pub fn finish128(&mut self) -> u128 {
-        let mut bits = ((self.total << 3) ^ (1 << 63)) as u64;
+        let mut bits = ((self.total as u64) << 3) ^ (1u64 << 63);
 
         if cfg!(target_endian = "big") {
             bits = bits.to_le();
@@ -185,7 +185,7 @@ impl T1ha2Hasher {
     }
 
     pub fn finish(&mut self) -> u64 {
-        let mut bits = ((self.total << 3) ^ (1 << 63)) as u64;
+        let mut bits = ((self.total as u64) << 3) ^ (1u64 << 63);
 
         if cfg!(target_endian = "big") {
             bits = bits.to_le();
