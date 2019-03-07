@@ -8,14 +8,13 @@ rust:
   - beta
   - nightly
 matrix:
-  include:
-    - env: CARGOFLAGS=
-    - env: CARGOFLAGS=--no-default-features
-    - env: CARGOFLAGS=--no-default-features --features std
-    - env: CARGOFLAGS=--no-default-features --features runtime_select
-    - env: CARGOFLAGS=--no-default-features --features runtime_select,std
   allow_failures:
     - rust: nightly
   fast_finish: true
+env:
+  - CARGOFLAGS=--no-default-features
+  - CARGOFLAGS=--no-default-features --features std
+  - CARGOFLAGS=--no-default-features --features runtime_select
+  - CARGOFLAGS=--no-default-features --features runtime_select,std
 script:
   - RUSTFLAGS="-C target-cpu=native" RUST_BACKTRACE=full cargo test --verbose $CARGOFLAGS
