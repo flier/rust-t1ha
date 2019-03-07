@@ -167,6 +167,10 @@ pub fn t1ha0_ia32aes(data: &[u8], seed: u64) -> u64 {
     }
 }
 
+#[cfg(all(
+    any(target_arch = "x86", target_arch = "x86_64"),
+    target_feature = "avx2"
+))]
 pub fn t1ha0_ia32aes_avx2(data: &[u8], seed: u64) -> u64 {
     let mut len = data.len();
     let mut a = seed;
@@ -312,15 +316,25 @@ pub fn t1ha0_ia32aes_avx2(data: &[u8], seed: u64) -> u64 {
     }
 }
 
-#[cfg(target_feature = "avx")]
+#[cfg(any(target_feature = "avx", target_feature = "avx2"))]
 unsafe fn mm_empty() {
     _mm256_zeroupper();
 }
 
-#[cfg(all(not(target_feature = "avx")))]
+#[cfg(all(
+    not(any(target_feature = "avx", target_feature = "avx2")),
+    target_feature = "mmx"
+))]
 unsafe fn mm_empty() {
     _mm_empty();
 }
+
+#[cfg(not(any(
+    target_feature = "avx",
+    target_feature = "avx2",
+    target_feature = "mmx"
+)))]
+unsafe fn mm_empty() {}
 
 #[cfg(all(
     target_arch = "x86_64",
@@ -347,8 +361,10 @@ unsafe fn extract_i64(x: __m128i) -> (i64, i64) {
 ))]
 unsafe fn extract_i64(x: __m128i) -> (i64, i64) {
     (
-        u32::from(_mm_extract_epi32(x, 0)) | u64::from(_mm_extract_epi32(x, 1)) << 32,
-        u32::from(_mm_extract_epi32(x, 2)) | u64::from(_mm_extract_epi32(x, 3)) << 32,
+        (((_mm_extract_epi32(x, 0) as u32) as u64) | u64::from(_mm_extract_epi32(x, 1)) << 32)
+            as i64,
+        (((_mm_extract_epi32(x, 2) as u32) as u64) | u64::from(_mm_extract_epi32(x, 3)) << 32)
+            as i64,
     )
 }
 

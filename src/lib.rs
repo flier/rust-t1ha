@@ -129,11 +129,6 @@ mod prefer {
 
 #[cfg(all(feature = "runtime_select", feature = "std"))]
 mod prefer {
-    #[cfg(any(
-        target_feature = "aes",
-        target_feature = "avx",
-        target_feature = "avx2",
-    ))]
     use std::is_x86_feature_detected;
 
     use lazy_static::lazy_static;
@@ -144,11 +139,30 @@ mod prefer {
         pub static ref HASH: fn(data: &[u8], seed: u64) -> u64 = t1ha0_resolve();
     }
 
+    #[cfg(target_pointer_width = "64")]
+    pub use crate::t1ha1 as t1ha0_fallback;
+
+    #[cfg(target_pointer_width = "32")]
+    pub use crate::t1ha0_32 as t1ha0_fallback;
+
     #[cfg(all(
-        target_feature = "aes",
-        target_feature = "avx",
-        target_feature = "avx2",
+        any(target_arch = "x86", target_arch = "x86_64"),
+        not(target_feature = "aes"),
     ))]
+    pub use self::t1ha0_fallback as t1ha0_ia32aes_noavx;
+
+    #[cfg(all(
+        any(target_arch = "x86", target_arch = "x86_64"),
+        not(target_feature = "avx")
+    ))]
+    pub use self::t1ha0_fallback as t1ha0_ia32aes_avx;
+
+    #[cfg(all(
+        any(target_arch = "x86", target_arch = "x86_64"),
+        not(target_feature = "avx2")
+    ))]
+    pub use self::t1ha0_fallback as t1ha0_ia32aes_avx2;
+
     fn t1ha0_resolve() -> fn(&[u8], u64) -> u64 {
         if is_x86_feature_detected!("avx2") {
             t1ha0_ia32aes_avx2
@@ -156,71 +170,9 @@ mod prefer {
             t1ha0_ia32aes_avx
         } else if is_x86_feature_detected!("aes") {
             t1ha0_ia32aes_noavx
-        } else if cfg!(target_pointer_width = "64") {
-            t1ha1
         } else {
-            t1ha0_32
+            t1ha0_fallback
         }
-    }
-
-    #[cfg(all(
-        any(target_arch = "x86", target_arch = "x86_64"),
-        target_feature = "aes",
-        target_feature = "avx",
-        not(target_feature = "avx2"),
-    ))]
-    fn t1ha0_resolve() -> fn(&[u8], u64) -> u64 {
-        if is_x86_feature_detected!("avx") {
-            t1ha0_ia32aes_avx
-        } else if is_x86_feature_detected!("aes") {
-            t1ha0_ia32aes_noavx
-        } else if cfg!(target_pointer_width = "64") {
-            t1ha1
-        } else {
-            t1ha0_32
-        }
-    }
-
-    #[cfg(all(
-        any(target_arch = "x86", target_arch = "x86_64"),
-        target_feature = "aes",
-        not(target_feature = "avx"),
-        not(target_feature = "avx2"),
-    ))]
-    fn t1ha0_resolve() -> fn(&[u8], u64) -> u64 {
-        if is_x86_feature_detected!("aes") {
-            t1ha0_ia32aes_noavx
-        } else if cfg!(target_pointer_width = "64") {
-            t1ha1
-        } else {
-            t1ha0_32
-        }
-    }
-
-    #[cfg(all(
-        any(target_arch = "x86", target_arch = "x86_64"),
-        not(all(
-            target_feature = "aes",
-            target_feature = "avx",
-            target_feature = "avx2"
-        )),
-        target_pointer_width = "64"
-    ))]
-    fn t1ha0_resolve() -> fn(&[u8], u64) -> u64 {
-        t1ha1
-    }
-
-    #[cfg(all(
-        any(target_arch = "x86", target_arch = "x86_64"),
-        not(all(
-            target_feature = "aes",
-            target_feature = "avx",
-            target_feature = "avx2"
-        )),
-        target_pointer_width = "32"
-    ))]
-    fn t1ha0_resolve() -> fn(&[u8], u64) -> u64 {
-        t1ha0_32
     }
 }
 
