@@ -3,13 +3,28 @@ name = "t1ha"
 version = "0.1.0"
 authors = ["Flier Lu <flier.lu@gmail.com>"]
 edition = "2018"
+license = "zlib License"
+readme = "README.md"
+repository = "https://github.com/flier/rust-t1ha"
+homepage = "https://github.com/flier/rust-t1ha"
+documentation = "http://doc.rust-lang.org/t1ha"
+keywords = ["hash", "t1ha"]
+categories = ["algorithms", "no-std"]
+build = "build.rs"
+exclude = ["/.travis.yml", "/appveyor.yml"]
+description = "An implementation of the T1AH (Fast Positive Hash) hash function."
 
 [lib]
 bench = false
 
+[badges]
+travis-ci = { repository = "flier/rust-t1ha" }
+appveyor = { repository = "flier/rust-t1ha", project_name = "flier/rust-t1ha" }
+
 [features]
 default = ["std", "runtime_select"]
 std = []
+doc = []
 unaligned_access = []
 runtime_select = ["lazy_static"]
 
