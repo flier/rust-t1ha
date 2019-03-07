@@ -161,6 +161,8 @@ mod prefer {
 
             use lazy_static::lazy_static;
 
+            use super::*;
+
             lazy_static! {
                 pub static ref HASH: fn(data: &[u8], seed: u64) -> u64 = t1ha0_resolve();
             }
