@@ -8,10 +8,21 @@ use std::slice;
 
 use criterion::{black_box, Criterion, ParameterizedBenchmark, Throughput};
 
-use t1ha::{
-    t1ha0_32, t1ha0_ia32aes_avx, t1ha0_ia32aes_avx2, t1ha1, t1ha2_atonce, t1ha2_atonce128,
-    T1ha2Hasher,
-};
+use t1ha::{t1ha0_32, t1ha1, t1ha2_atonce, t1ha2_atonce128, T1ha2Hasher};
+
+#[cfg(target_feature = "avx2")]
+use t1ha::t1ha0_ia32aes_avx2;
+#[cfg(not(target_feature = "avx2"))]
+fn t1ha0_ia32aes_avx2(_data: &[u8], _seed: u64) -> u64 {
+    0
+}
+
+#[cfg(target_feature = "avx")]
+use t1ha::t1ha0_ia32aes_avx;
+#[cfg(not(target_feature = "avx"))]
+fn t1ha0_ia32aes_avx(_data: &[u8], _seed: u64) -> u64 {
+    0
+}
 
 const KB: usize = 1024;
 const SEED: u64 = 0x0123456789ABCDEF;
@@ -40,22 +51,28 @@ fn bench_t1ha0(c: &mut Criterion) {
         .throughput(|&&size| Throughput::Bytes(size as u32)),
     );
 
+    let mut bench = ParameterizedBenchmark::new(
+        "t1ha0_32",
+        move |b, &&size| {
+            b.iter(|| t1ha0_32(&DATA[..size], SEED));
+        },
+        &PARAMS,
+    );
+
+    if cfg!(target_feature = "avx") {
+        bench = bench.with_function("t1ha0_ia32aes_avx", move |b, &&size| {
+            b.iter(|| t1ha0_ia32aes_avx(&DATA[..size], SEED));
+        });
+    }
+    if cfg!(target_feature = "avx2") {
+        bench = bench.with_function("t1ha0_ia32aes_avx2", move |b, &&size| {
+            b.iter(|| t1ha0_ia32aes_avx2(&DATA[..size], SEED));
+        });
+    }
+
     c.bench(
         "t1ha0",
-        ParameterizedBenchmark::new(
-            "t1ha0_32",
-            move |b, &&size| {
-                b.iter(|| t1ha0_32(&DATA[..size], SEED));
-            },
-            &PARAMS,
-        )
-        .with_function("t1ha0_ia32aes_avx", move |b, &&size| {
-            b.iter(|| t1ha0_ia32aes_avx(&DATA[..size], SEED));
-        })
-        .with_function("t1ha0_ia32aes_avx2", move |b, &&size| {
-            b.iter(|| t1ha0_ia32aes_avx2(&DATA[..size], SEED));
-        })
-        .throughput(|&&size| Throughput::Bytes(size as u32)),
+        bench.throughput(|&&size| Throughput::Bytes(size as u32)),
     );
 
     c.bench(
@@ -84,14 +101,14 @@ fn bench_t1ha0(c: &mut Criterion) {
         })
         .with_function("t1ha2_stream", move |b, &&size| {
             b.iter(|| {
-                let mut h = T1ha2Hasher::new(SEED, SEED);
+                let mut h = T1ha2Hasher::with_seeds(SEED, SEED);
                 h.update(&DATA[..size]);
                 h.finish()
             });
         })
         .with_function("t1ha2_stream128", move |b, &&size| {
             b.iter(|| {
-                let mut h = T1ha2Hasher::new(SEED, SEED);
+                let mut h = T1ha2Hasher::with_seeds(SEED, SEED);
                 h.update(&DATA[..size]);
                 h.finish128() as u64
             });

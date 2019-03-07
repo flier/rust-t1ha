@@ -129,6 +129,11 @@ mod prefer {
 
 #[cfg(all(feature = "runtime_select", feature = "std"))]
 mod prefer {
+    #[cfg(any(
+        target_feature = "aes",
+        target_feature = "avx",
+        target_feature = "avx2",
+    ))]
     use std::is_x86_feature_detected;
 
     use lazy_static::lazy_static;
