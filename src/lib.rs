@@ -102,9 +102,37 @@ cfg_if! {
         use std::collections::{HashMap, HashSet};
 
         /// A `HashMap` using a default `t1ha` hasher.
+        ///
+        /// # Example
+        ///
+        /// ```
+        /// use t1ha::T1haHashMap;
+        ///
+        /// let mut map = T1haHashMap::default();
+        /// map.insert(1, "one");
+        /// map.insert(2, "two");
+        ///
+        /// map = T1haHashMap::with_capacity_and_hasher(10, Default::default());
+        /// map.insert(1, "one");
+        /// map.insert(2, "two");
+        /// ```
         pub type T1haHashMap<K, V> = HashMap<K, V, T1haBuildHasher>;
 
         /// A `HashSet` using a default `t1ha` hasher.
+        ///
+        /// # Example
+        ///
+        /// ```
+        /// use t1ha::T1haHashSet;
+        ///
+        /// let mut set = T1haHashSet::default();
+        /// set.insert(1);
+        /// set.insert(2);
+        ///
+        /// set = T1haHashSet::with_capacity_and_hasher(10, Default::default());
+        /// set.insert(1);
+        /// set.insert(2);
+        /// ```
         pub type T1haHashSet<T> = HashSet<T, T1haBuildHasher>;
     }
 }
