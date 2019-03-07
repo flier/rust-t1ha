@@ -24,7 +24,6 @@ appveyor = { repository = "flier/rust-t1ha", project_name = "flier/rust-t1ha" }
 [features]
 default = ["std", "runtime_select"]
 std = []
-doc = []
 unaligned_access = []
 runtime_select = ["lazy_static"]
 
@@ -42,6 +41,11 @@ lazy_static = "1.3"
 
 [build-dependencies]
 rustc_version = "0.2"
+
+[package.metadata.docs.rs]
+all-features = true
+default-target = "x86_64-unknown-linux-gnu"
+rustc-args = ["-C target-feature=aes,avx,avx2"]
 
 [[bench]]
 name = "t1ha"
