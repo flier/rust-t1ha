@@ -12,16 +12,16 @@ matrix:
     - rust: nightly
   fast_finish: true
 env:
-  - CARGOFLAGS=--no-default-features
-  - CARGOFLAGS=--no-default-features --features std
-  - CARGOFLAGS=--no-default-features --features runtime_select
-  - CARGOFLAGS=--no-default-features --features runtime_select,std
-  - RUSTFLAGS=-C target-cpu=native
-  - RUSTFLAGS=-C target-feature=aes
-  - RUSTFLAGS=-C target-feature=avx
-  - RUSTFLAGS=-C target-feature=avx2
-  - RUSTFLAGS=-C target-feature=aes,avx
-  - RUSTFLAGS=-C target-feature=aes,avx2
-  - RUSTFLAGS=-C target-feature=aes,avx,avx2
+  - CARGOFLAGS="--no-default-features"
+  - CARGOFLAGS="--no-default-features --features std"
+  - CARGOFLAGS="--no-default-features --features runtime_select"
+  - CARGOFLAGS="--no-default-features --features runtime_select,std"
+  - RUSTFLAGS="-C target-cpu=native"
+  - RUSTFLAGS="-C target-feature=aes"
+  - RUSTFLAGS="-C target-feature=avx"
+  - RUSTFLAGS="-C target-feature=avx2"
+  - RUSTFLAGS="-C target-feature=aes,avx"
+  - RUSTFLAGS="-C target-feature=aes,avx2"
+  - RUSTFLAGS="-C target-feature=aes,avx,avx2"
 script:
   - RUST_BACKTRACE=full cargo test --verbose $CARGOFLAGS
