@@ -17,8 +17,5 @@ matrix:
   allow_failures:
     - rust: nightly
   fast_finish: true
-env:
-  - RUSTFLAGS="-C target-cpu=native"
-  - RUST_BACKTRACE=full
 script:
-  - cargo test --verbose $CARGOFLAGS
+  - RUSTFLAGS="-C target-cpu=native" RUST_BACKTRACE=full cargo test --verbose $CARGOFLAGS
