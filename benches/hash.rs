@@ -9,8 +9,10 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::Hasher;
 use std::hash::SipHasher;
 use std::io::BufReader;
+use std::mem;
+use std::slice;
 
-use criterion::{Criterion, ParameterizedBenchmark, Throughput};
+use criterion::{black_box, Criterion, ParameterizedBenchmark, Throughput};
 
 use ahash::AHasher;
 use farmhash::{hash32_with_seed as farmhash32, hash64_with_seed as farmhash64};
@@ -52,6 +54,26 @@ const PARAMS: [usize; 7] = [7, 8, 32, 256, KB, 4 * KB, 16 * KB];
 
 lazy_static! {
     static ref DATA: Vec<u8> = (0..16 * KB).map(|b| b as u8).collect::<Vec<_>>();
+}
+
+fn bench_memory(c: &mut Criterion) {
+    c.bench(
+        "memory",
+        ParameterizedBenchmark::new(
+            "sum",
+            move |b, &&size| {
+                let s = unsafe {
+                    slice::from_raw_parts(DATA.as_ptr() as *mut u32, size / mem::size_of::<u32>())
+                };
+
+                b.iter(|| {
+                    black_box(s.iter().fold(0u64, |acc, &x| acc + x as u64));
+                })
+            },
+            &PARAMS,
+        )
+        .throughput(|&&size| Throughput::Bytes(size as u32)),
+    );
 }
 
 fn bench_hash32(c: &mut Criterion) {
@@ -237,5 +259,11 @@ fn bench_hash128(c: &mut Criterion) {
     );
 }
 
-criterion_group!(benches, bench_hash32, bench_hash64, bench_hash128);
+criterion_group!(
+    benches,
+    bench_memory,
+    bench_hash32,
+    bench_hash64,
+    bench_hash128
+);
 criterion_main!(benches);

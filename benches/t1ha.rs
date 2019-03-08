@@ -34,7 +34,7 @@ lazy_static! {
 
 fn bench_t1ha(c: &mut Criterion) {
     c.bench(
-        "memory scan",
+        "memory",
         ParameterizedBenchmark::new(
             "sum",
             move |b, &&size| {
