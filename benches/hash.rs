@@ -16,6 +16,7 @@ use ahash::AHasher;
 use farmhash::{hash32_with_seed as farmhash32, hash64_with_seed as farmhash64};
 use fnv::FnvHasher;
 use fxhash::{hash32 as fxhash32, hash64 as fxhash64};
+use meowhash::MeowHasher;
 use metrohash::{MetroHash128, MetroHash64};
 use murmur3::{murmur3_32, murmur3_x64_128, murmur3_x86_128};
 use rustc_hash::FxHasher;
@@ -221,6 +222,12 @@ fn bench_hash128(c: &mut Criterion) {
 
                 murmur3_x86_128(&mut r, SEED as u32, &mut out);
             });
+        });
+    }
+
+    if cfg!(target_feature = "aes") {
+        bench = bench.with_function("meowhash128", move |b, &&size| {
+            b.iter(|| MeowHasher::digest_with_seed(SEED as u128, &DATA[..size]));
         });
     }
 

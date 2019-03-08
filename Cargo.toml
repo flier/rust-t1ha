@@ -48,6 +48,7 @@ seahash = "3.0"
 fxhash = "0.2"
 ahash = "0.1"
 rustc-hash = "1.0"
+meowhash = "0.1"
 
 [build-dependencies]
 rustc_version = "0.2"
