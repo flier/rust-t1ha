@@ -70,7 +70,9 @@ set.insert(2);
 
 You could choose the right implementation base on your `target_cpu`.
 
- > $ RUSTFLAGS="-C target-cpu=native" cargo build
+```sh
+$ RUSTFLAGS="-C target-cpu=native" cargo build
+```
 
 ### Benchmark
 
