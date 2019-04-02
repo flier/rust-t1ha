@@ -6,7 +6,7 @@ extern crate lazy_static;
 extern crate criterion;
 
 use std::collections::hash_map::DefaultHasher;
-use std::hash::Hasher;
+use std::hash::{Hasher, BuildHasher};
 use std::hash::SipHasher;
 use std::io::BufReader;
 use std::mem;
@@ -14,7 +14,7 @@ use std::slice;
 
 use criterion::{black_box, Criterion, ParameterizedBenchmark, Throughput};
 
-use ahash::AHasher;
+use ahash::ABuildHasher;
 use farmhash::{hash32_with_seed as farmhash32, hash64_with_seed as farmhash64};
 use fnv::FnvHasher;
 use fxhash::{hash32 as fxhash32, hash64 as fxhash64};
@@ -192,8 +192,9 @@ fn bench_hash64(c: &mut Criterion) {
                 b.iter(|| fxhash64(&DATA[..size]));
             })
             .with_function("ahash", move |b, &&size| {
+                let builder = ABuildHasher::new();
                 b.iter(|| {
-                    let mut h = AHasher::new_with_keys(SEED, SEED);
+                    let mut h = builder.build_hasher();
                     h.write(&DATA[..size]);
                     h.finish()
                 });
