@@ -1,6 +1,6 @@
 [package]
 name = "t1ha"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Flier Lu <flier.lu@gmail.com>"]
 edition = "2018"
 license = "Zlib"
@@ -28,7 +28,7 @@ unaligned_access = []
 runtime_select = ["lazy_static"]
 
 [dependencies]
-cfg-if = "0.1"
+cfg-if = "1.0"
 lazy_static = { version = "1.3", optional = true }
 
 [dependencies.num-traits]
