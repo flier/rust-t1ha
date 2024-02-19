@@ -27,6 +27,7 @@ use rustc_hash::FxHasher;
 use seahash::hash_seeded as seahash64;
 use t1ha::{t1ha0_32, t1ha1, t1ha2_atonce, t1ha2_atonce128};
 use twox_hash::{XxHash as XxHash64, XxHash32};
+use wyhash::wyhash;
 use xxhash2::{hash32 as xxhash32, hash64 as xxhash64};
 
 cfg_if! {
@@ -239,7 +240,10 @@ fn bench_hash64(c: &mut Criterion) {
                         h.finish()
                     });
                 },
-            );
+            )
+            .bench_with_input(BenchmarkId::new("wyhash", size), &size, |b, _| {
+                b.iter(|| wyhash(data, SEED));
+            });
     }
 }
 
