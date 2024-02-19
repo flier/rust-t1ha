@@ -39,6 +39,7 @@ default-features = false
 ahash = "0.8"
 criterion = "0.5"
 farmhash = "1.1"
+fastmurmur3 = "0.2"
 fnv = "1.0"
 fxhash = "0.2"
 lazy_static = "1.4"
@@ -48,8 +49,8 @@ murmur3 = "0.5"
 rustc-hash = "1.1"
 seahash = "4.1"
 twox-hash = "1.6"
-xxhash2 = "0.1"
 wyhash = "0.5"
+xxhash2 = "0.1"
 
 [build-dependencies]
 rustc_version = "0.4"

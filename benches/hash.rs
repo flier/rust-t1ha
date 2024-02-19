@@ -18,6 +18,7 @@ use criterion::{black_box, BenchmarkId, Criterion, Throughput};
 
 use ahash::AHasher;
 use farmhash::{hash32_with_seed as farmhash32, hash64_with_seed as farmhash64};
+use fastmurmur3::murmur3_x64_128 as fastmurmur3_x64_128;
 use fnv::FnvHasher;
 use fxhash::{hash32 as fxhash32, hash64 as fxhash64};
 use meowhash::{MeowHash, MeowHasher};
@@ -264,19 +265,18 @@ fn bench_hash128(c: &mut Criterion) {
                     h.write(data);
                     h.finish128()
                 })
-            });
-
-        if cfg!(target_arch = "x86_64") {
-            group.bench_with_input(BenchmarkId::new("murmur3_x64_128", size), &size, |b, _| {
+            })
+            .bench_with_input(
+                BenchmarkId::new("fastmurmur3_x64_128", size),
+                &size,
+                |b, _| b.iter(|| fastmurmur3_x64_128(data, SEED as _)),
+            )
+            .bench_with_input(BenchmarkId::new("murmur3_x64_128", size), &size, |b, _| {
                 b.iter(|| murmur3_x64_128(&mut BufReader::new(data), SEED as _))
-            });
-        }
-
-        if cfg!(target_arch = "x86") {
-            group.bench_with_input(BenchmarkId::new("murmur3_x86_128", size), &size, |b, _| {
+            })
+            .bench_with_input(BenchmarkId::new("murmur3_x86_128", size), &size, |b, _| {
                 b.iter(|| murmur3_x86_128(&mut BufReader::new(data), SEED as _))
             });
-        }
 
         if cfg!(target_feature = "aes") {
             group.bench_with_input(BenchmarkId::new("meowhash128", size), &size, |b, _| {
