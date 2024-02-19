@@ -85,25 +85,25 @@ where
     }
 
     match len {
-        32 | 31 | 30 | 29 | 28 | 27 | 26 | 25 => {
+        25..=32 => {
             b = b.wrapping_add(mux64(T::fetch(v.offset(0)), PRIME_4));
             a = a.wrapping_add(mux64(T::fetch(v.offset(1)), PRIME_3));
             b = b.wrapping_add(mux64(T::fetch(v.offset(2)), PRIME_2));
             a = a.wrapping_add(mux64(T::tail(v.offset(3), len as isize), PRIME_1));
             final_weak_avalanche(a, b)
         }
-        24 | 23 | 22 | 21 | 20 | 19 | 18 | 17 => {
+        17..=24 => {
             a = a.wrapping_add(mux64(T::fetch(v.offset(0)), PRIME_3));
             b = b.wrapping_add(mux64(T::fetch(v.offset(1)), PRIME_2));
             a = a.wrapping_add(mux64(T::tail(v.offset(2), len as isize), PRIME_1));
             final_weak_avalanche(a, b)
         }
-        16 | 15 | 14 | 13 | 12 | 11 | 10 | 9 => {
+        9..=16 => {
             b = b.wrapping_add(mux64(T::fetch(v.offset(0)), PRIME_2));
             a = a.wrapping_add(mux64(T::tail(v.offset(1), len as isize), PRIME_1));
             final_weak_avalanche(a, b)
         }
-        8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 => {
+        1..=8 => {
             a = a.wrapping_add(mux64(T::tail(v, len as isize), PRIME_1));
             final_weak_avalanche(a, b)
         }

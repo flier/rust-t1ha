@@ -244,7 +244,7 @@ unsafe fn t1ha2_tail_ab<T: MemoryModel<Item = u64>>(state: &mut State, data: &[u
     let len = data.len();
 
     match len {
-        32 | 31 | 30 | 29 | 28 | 27 | 26 | 25 => {
+        25..=32 => {
             mixup64(&mut state.a, &mut state.b, T::fetch(v.offset(0)), PRIME_4);
             mixup64(&mut state.b, &mut state.a, T::fetch(v.offset(1)), PRIME_3);
             mixup64(&mut state.a, &mut state.b, T::fetch(v.offset(2)), PRIME_2);
@@ -256,7 +256,7 @@ unsafe fn t1ha2_tail_ab<T: MemoryModel<Item = u64>>(state: &mut State, data: &[u
             );
             final64(state.a, state.b)
         }
-        24 | 23 | 22 | 21 | 20 | 19 | 18 | 17 => {
+        17..=24 => {
             mixup64(&mut state.b, &mut state.a, T::fetch(v.offset(0)), PRIME_3);
             mixup64(&mut state.a, &mut state.b, T::fetch(v.offset(1)), PRIME_2);
             mixup64(
@@ -267,7 +267,7 @@ unsafe fn t1ha2_tail_ab<T: MemoryModel<Item = u64>>(state: &mut State, data: &[u
             );
             final64(state.a, state.b)
         }
-        16 | 15 | 14 | 13 | 12 | 11 | 10 | 9 => {
+        9..=16 => {
             mixup64(&mut state.a, &mut state.b, T::fetch(v.offset(0)), PRIME_2);
             mixup64(
                 &mut state.b,
@@ -277,7 +277,7 @@ unsafe fn t1ha2_tail_ab<T: MemoryModel<Item = u64>>(state: &mut State, data: &[u
             );
             final64(state.a, state.b)
         }
-        8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 => {
+        1..=8 => {
             mixup64(
                 &mut state.b,
                 &mut state.a,
@@ -297,7 +297,7 @@ unsafe fn t1ha2_tail_abcd<T: MemoryModel<Item = u64>>(state: &mut State, data: &
     let len = data.len();
 
     match len {
-        32 | 31 | 30 | 29 | 28 | 27 | 26 | 25 => {
+        25..=32 => {
             mixup64(&mut state.a, &mut state.d, T::fetch(v.offset(0)), PRIME_4);
             mixup64(&mut state.b, &mut state.a, T::fetch(v.offset(1)), PRIME_3);
             mixup64(&mut state.c, &mut state.b, T::fetch(v.offset(2)), PRIME_2);
@@ -309,7 +309,7 @@ unsafe fn t1ha2_tail_abcd<T: MemoryModel<Item = u64>>(state: &mut State, data: &
             );
             final128(state)
         }
-        24 | 23 | 22 | 21 | 20 | 19 | 18 | 17 => {
+        17..=24 => {
             mixup64(&mut state.b, &mut state.a, T::fetch(v.offset(0)), PRIME_3);
             mixup64(&mut state.c, &mut state.b, T::fetch(v.offset(1)), PRIME_2);
             mixup64(
@@ -320,7 +320,7 @@ unsafe fn t1ha2_tail_abcd<T: MemoryModel<Item = u64>>(state: &mut State, data: &
             );
             final128(state)
         }
-        16 | 15 | 14 | 13 | 12 | 11 | 10 | 9 => {
+        9..=16 => {
             mixup64(&mut state.c, &mut state.b, T::fetch(v.offset(0)), PRIME_2);
             mixup64(
                 &mut state.d,
@@ -330,7 +330,7 @@ unsafe fn t1ha2_tail_abcd<T: MemoryModel<Item = u64>>(state: &mut State, data: &
             );
             final128(state)
         }
-        8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 => {
+        1..=8 => {
             mixup64(
                 &mut state.d,
                 &mut state.c,

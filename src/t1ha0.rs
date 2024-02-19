@@ -112,7 +112,7 @@ where
     }
 
     match len {
-        16 | 15 | 14 | 13 => {
+        13..=16 => {
             mixup32(&mut a, &mut b, T::fetch(v.offset(0)), PRIME32_4);
             mixup32(&mut b, &mut a, T::fetch(v.offset(1)), PRIME32_3);
             mixup32(&mut a, &mut b, T::fetch(v.offset(2)), PRIME32_2);
@@ -124,7 +124,7 @@ where
             );
             final32(a, b)
         }
-        12 | 11 | 10 | 9 => {
+        9..=12 => {
             mixup32(&mut b, &mut a, T::fetch(v.offset(0)), PRIME32_3);
             mixup32(&mut a, &mut b, T::fetch(v.offset(1)), PRIME32_2);
             mixup32(
@@ -135,7 +135,7 @@ where
             );
             final32(a, b)
         }
-        8 | 7 | 6 | 5 => {
+        5..=8 => {
             mixup32(&mut a, &mut b, T::fetch(v.offset(0)), PRIME32_2);
             mixup32(
                 &mut b,
@@ -145,7 +145,7 @@ where
             );
             final32(a, b)
         }
-        4 | 3 | 2 | 1 => {
+        1..=4 => {
             mixup32(
                 &mut b,
                 &mut a,

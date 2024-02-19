@@ -148,11 +148,11 @@ pub fn rot64(v: u64, n: u32) -> u64 {
 #[inline(always)]
 pub fn final32(a: u32, b: u32) -> u64 {
     let mut l = u64::from(b ^ rot32(a, 13)) | u64::from(a) << 32;
-    l = l.wrapping_mul(PRIME_0 as u64);
+    l = l.wrapping_mul(PRIME_0);
     l ^= l.wrapping_shr(41);
-    l = l.wrapping_mul(PRIME_4 as u64);
+    l = l.wrapping_mul(PRIME_4);
     l ^= l.wrapping_shr(47);
-    l = l.wrapping_mul(PRIME_6 as u64);
+    l = l.wrapping_mul(PRIME_6);
     l
 }
 
