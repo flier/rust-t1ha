@@ -1,6 +1,6 @@
 [package]
 name = "t1ha"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Flier Lu <flier.lu@gmail.com>"]
 edition = "2018"
 license = "Zlib"
@@ -11,7 +11,7 @@ documentation = "http://doc.rust-lang.org/t1ha"
 keywords = ["hash", "t1ha"]
 categories = ["algorithms", "no-std"]
 build = "build.rs"
-exclude = ["/.travis.yml", "/appveyor.yml"]
+exclude = ["/appveyor.yml"]
 description = "An implementation of the T1AH (Fast Positive Hash) hash function."
 
 [lib]
