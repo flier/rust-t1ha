@@ -18,7 +18,6 @@ use criterion::{black_box, BenchmarkId, Criterion, Throughput};
 
 use ahash::AHasher;
 use farmhash::{hash32_with_seed as farmhash32, hash64_with_seed as farmhash64};
-use fastmurmur3::murmur3_x64_128 as fastmurmur3_x64_128;
 use fnv::FnvHasher;
 use fxhash::{hash32 as fxhash32, hash64 as fxhash64};
 use meowhash::{MeowHash, MeowHasher};
@@ -281,9 +280,9 @@ fn bench_hash128(c: &mut Criterion) {
                 })
             })
             .bench_with_input(
-                BenchmarkId::new("fastmurmur3_x64_128", size),
+                BenchmarkId::new("fastmurmur3::murmur3_x64_128", size),
                 &size,
-                |b, _| b.iter(|| fastmurmur3_x64_128(data, SEED as _)),
+                |b, _| b.iter(|| fastmurmur3::murmur3_x64_128(data, SEED as _)),
             )
             .bench_with_input(BenchmarkId::new("murmur3_x64_128", size), &size, |b, _| {
                 b.iter(|| murmur3_x64_128(&mut BufReader::new(data), SEED as _))
@@ -292,10 +291,17 @@ fn bench_hash128(c: &mut Criterion) {
                 b.iter(|| murmur3_x86_128(&mut BufReader::new(data), SEED as _))
             })
             .bench_with_input(
-                BenchmarkId::new("twox_hash::xxh3_128", size),
+                BenchmarkId::new("twox_hash::xxh3::hash128_with_seed", size),
                 &size,
                 |b, _| {
                     b.iter(|| twox_hash::xxh3::hash128_with_seed(data, SEED));
+                },
+            )
+            .bench_with_input(
+                BenchmarkId::new("xxhash_rust::xxh3::xxh3_128_with_seed", size),
+                &size,
+                |b, _| {
+                    b.iter(|| xxhash_rust::xxh3::xxh3_128_with_seed(data, SEED));
                 },
             );
 
