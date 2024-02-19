@@ -30,7 +30,6 @@ use t1ha::{t1ha0_32, t1ha1, t1ha2_atonce, t1ha2_atonce128};
 use twox_hash::{XxHash as XxHash64, XxHash32};
 use wyhash::wyhash;
 use xxhash2::{hash32 as xxhash32, hash64 as xxhash64};
-use xxhash_rust::xxh3::xxh3_64_with_seed;
 
 cfg_if! {
     if #[cfg(target_feature = "aes")] {
@@ -219,9 +218,20 @@ fn bench_hash64(c: &mut Criterion) {
                     });
                 },
             )
-            .bench_with_input(BenchmarkId::new("xxh3_64", size), &size, |b, _| {
-                b.iter(|| xxh3_64_with_seed(data, SEED));
-            })
+            .bench_with_input(
+                BenchmarkId::new("twox_hash::xxh3_64", size),
+                &size,
+                |b, _| {
+                    b.iter(|| twox_hash::xxh3::hash64_with_seed(data, SEED));
+                },
+            )
+            .bench_with_input(
+                BenchmarkId::new("xxhash_rust::xxh3_64", size),
+                &size,
+                |b, _| {
+                    b.iter(|| xxhash_rust::xxh3::xxh3_64_with_seed(data, SEED));
+                },
+            )
             .bench_with_input(BenchmarkId::new("seahash", size), &size, |b, _| {
                 b.iter(|| seahash64(data, SEED, SEED, SEED, SEED));
             })
@@ -280,7 +290,14 @@ fn bench_hash128(c: &mut Criterion) {
             })
             .bench_with_input(BenchmarkId::new("murmur3_x86_128", size), &size, |b, _| {
                 b.iter(|| murmur3_x86_128(&mut BufReader::new(data), SEED as _))
-            });
+            })
+            .bench_with_input(
+                BenchmarkId::new("twox_hash::xxh3_128", size),
+                &size,
+                |b, _| {
+                    b.iter(|| twox_hash::xxh3::hash128_with_seed(data, SEED));
+                },
+            );
 
         if cfg!(target_feature = "aes") {
             group.bench_with_input(BenchmarkId::new("meowhash128", size), &size, |b, _| {
