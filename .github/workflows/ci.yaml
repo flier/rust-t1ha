@@ -22,13 +22,17 @@ jobs:
         rust:
           - stable
           - nightly
+        args:
+          -
+          - --no-default-features
+          - --no-default-features --features runtime_select
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
       - run: |
-          cargo test -v
+          cargo test -v ${{ matrix.args }}
 
   fmt:
     runs-on: ubuntu-latest
