@@ -1,4 +1,4 @@
-# rust-t1ha [![travis](https://travis-ci.org/flier/rust-t1ha.svg?branch=master)](https://travis-ci.org/flier/rust-t1ha) [![appveyor](https://ci.appveyor.com/api/projects/status/c5hli7g424r0g49n?svg=true)](https://ci.appveyor.com/project/flier/rust-t1ha) [![crate](https://img.shields.io/crates/v/t1ha.svg)](https://crates.io/crates/t1ha) [![docs](https://docs.rs/t1ha/badge.svg)](https://docs.rs/t1ha)
+# rust-t1ha [![Continuous integration](https://github.com/flier/rust-t1ha/actions/workflows/ci.yaml/badge.svg)](https://github.com/flier/rust-t1ha/actions/workflows/ci.yaml) [![appveyor](https://ci.appveyor.com/api/projects/status/c5hli7g424r0g49n?svg=true)](https://ci.appveyor.com/project/flier/rust-t1ha) [![crate](https://img.shields.io/crates/v/t1ha.svg)](https://crates.io/crates/t1ha) [![docs](https://docs.rs/t1ha/badge.svg)](https://docs.rs/t1ha)
 
 An implementation of the [T1HA (Fast Positive Hash)](https://github.com/leo-yuriev/t1ha) hash function.
 
